@@ -52,6 +52,19 @@
             color: #FFDD57;
             font-size: 18px;
         }
+        .download-btn {
+            display: inline-block;
+            background-color: #00c853;
+            color: white;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 16px;
+        }
+        .download-btn:hover {
+            background-color: #00e676;
+        }
     </style>
 </head>
 <body>
@@ -119,11 +132,10 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.url) {
-                        resultDiv.innerHTML = "<p class='loading'>La descarga comenzará automáticamente...</p>";
-                        const link = document.createElement('a');
-                        link.href = data.url;
-                        link.download = '';
-                        link.click();
+                        resultDiv.innerHTML = `
+                            <p>✅ Contenido encontrado. ¡Descarga disponible!</p>
+                            <a href="${data.url}" target="_blank" class="download-btn">Descargar</a>
+                        `;
                     } else {
                         resultDiv.innerHTML = `<p class='error'>Error: ${data.error?.message || "No se pudo obtener el enlace. Prueba con otro servidor."}</p>`;
                     }
