@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Descargar de YouTube</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 400px;
+            margin: auto;
+            padding: 20px;
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        }
+        input, select, button {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        input, select {
+            background-color: #2e2e2e;
+            color: #ffffff;
+        }
+        button {
+            background-color: #00c853;
+            color: #ffffff;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #00e676;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        .error {
+            color: red;
+        }
+        .loading {
+            color: #FFDD57;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Descargar de YouTube</h2>
+        <p>Introduce el enlace de YouTube o el nombre del contenido.</p>
+        
+        <input type="text" id="urlInput" placeholder="Pega el enlace de YouTube">
+        <input type="text" id="contentName" placeholder="O ingresa el nombre del contenido">
+
+        <label for="serverSelect">Selecciona el servidor:</label>
+        <select id="serverSelect">
+            <option value="1">🇵🇾 Paraguay</option>
+            <option value="2">🇧🇷 Brasil</option>
+            <option value="3">🇦🇷 Argentina</option>
+            <option value="4">🇲🇽 México</option>
+            <option value="5">🇪🇸 España</option>
+            <option value="6">🇦🇺 Australia</option>
+        </select>
+
+        <label for="formatSelect">Formato de descarga:</label>
+        <select id="formatSelect">
+            <option value="audio">Audio</option>
+            <option value="video">Video</option>
+        </select>
+
+        <button onclick="download()">Descargar</button>
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        function download() {
+            const url = document.getElementById("urlInput").value;
+            const contentName = document.getElementById("contentName").value;
+            const server = document.getElementById("serverSelect").value;
+            const format = document.getElementById("formatSelect").value;
+            const resultDiv = document.getElementById("result");
+
+            if (!url && !contentName) {
+                resultDiv.innerHTML = "<p class='error'>Por favor, ingresa un enlace o un nombre.</p>";
+                return;
+            }
+
+            const servers = {
+                "1": { url_audio: "https://api.spiderx.com.br/api/downloads/play-audio", url_video: "https://api.spiderx.com.br/api/downloads/play-video", token: "65FJ8a16vSNOzO2a3nvb" },
+                "2": { url_audio: "https://api.spiderx.com.br/api/downloads/play-audio", url_video: "https://api.spiderx.com.br/api/downloads/play-video", token: "6WSI3rEFKOncTVfdbJQb" },
+                "3": { url_audio: "https://api.spiderx.com.br/api/downloads/play-audio", url_video: "https://api.spiderx.com.br/api/downloads/play-video", token: "tO6jozYYllNkYToLXwoK" },
+                "4": { url_audio: "https://api.spiderx.com.br/api/downloads/play-audio", url_video: "https://api.spiderx.com.br/api/downloads/play-video", token: "YpfizeiakIRRkgrRxsfq" },
+                "5": { url_audio: "https://api.spiderx.com.br/api/downloads/play-audio", url_video: "https://api.spiderx.com.br/api/downloads/play-video", token: "fdH7Z3Q1H7zKcQhIazxN" },
+                "6": { url_audio: "https://api.spiderx.com.br/api/downloads/play-audio", url_video: "https://api.spiderx.com.br/api/downloads/play-video", token: "0GKRFedVh1rczbZYLjfk" },
+            };
+
+            const selectedServer = servers[server];
+            if (!selectedServer) {
+                resultDiv.innerHTML = "<p class='error'>Servidor no válido.</p>";
+                return;
+            }
+
+            const apiUrl = format === "audio" ? selectedServer.url_audio : selectedServer.url_video;
+            const apiRequest = `${apiUrl}?search=${encodeURIComponent(url || contentName)}&api_key=${selectedServer.token}`;
+
+            resultDiv.innerHTML = "<p class='loading'>Buscando el contenido, por favor espera...</p>";
+
+            fetch(apiRequest)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.url) {
+                        resultDiv.innerHTML = "<p class='loading'>La descarga comenzará automáticamente...</p>";
+                        const link = document.createElement('a');
+                        link.href = data.url;
+                        link.download = '';
+                        link.click();
+                    } else {
+                        resultDiv.innerHTML = `<p class='error'>Error: ${data.error?.message || "No se pudo obtener el enlace. Prueba con otro servidor."}</p>`;
+                    }
+                })
+                .catch(error => {
+                    resultDiv.innerHTML = "<p class='error'>Hubo un problema al intentar obtener el contenido. Intenta nuevamente.</p>";
+                    console.error("Error:", error);
+                });
+        }
+    </script>
+</body>
+</html>
